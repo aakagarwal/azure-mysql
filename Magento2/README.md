@@ -1,0 +1,1 @@
+# Deploying Magento on AKS Cluster and Azure Database - Flexible Server
