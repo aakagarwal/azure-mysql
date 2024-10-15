@@ -3,19 +3,34 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "azureSubscriptionId": {
-            "type": "string"
+            "type": "string",
+            "metadata": {
+                "description": "The subscriptionId where the resources will be deployed."
+            }
         },
         "azureResourceGroup": {
-            "type": "string"
+            "type": "string",
+            "metadata": {
+                "description": "The resource group where the resources will be deployed."
+            }
         },
         "servicePrincipalAppId": {
-            "type": "securestring"
+            "type": "securestring",
+            "metadata": {
+                "description": "The service principal appId for the Azure subscription."
+            }
         },
         "servicePrincipalPassword": {
-            "type": "securestring"
+            "type": "securestring",
+            "metadata": {
+                "description": "The service principal password for the Azure subscription."
+            }
         },
         "tenentId": {
-            "type": "securestring"
+            "type": "securestring",
+            "metadata": {
+                "description": "The tenantId for the Azure subscription."
+            }
         },
         "composerUsername": {
             "type": "string",
@@ -31,43 +46,50 @@
         },
         "magentoAdminUsername": {
             "type": "string",
-            "defaultValue": "magentodemoadmin"
+            "defaultValue": "magentoadminuser",
+            "metadata": {
+                "description": "The username for the Magento admin."
+            }
         },
         "magentoAdminPassword": {
             "type": "securestring",
-            "defaultValue": "password1234"
+            "defaultValue": "magentoadmin@1234",
+            "metadata": {
+                "description": "The password for the Magento admin."
+            }
+
         },
         "redisCacheSwitch": {
             "type": "bool",
             "defaultValue": true,
             "metadata": {
-                "description": "Enable Redis for Magento."
+                "description": "Enable/Disable Redis for Magento."
             }
         },
         "varnishCacheSwitch": {
             "type": "bool",
             "defaultValue": true,
             "metadata": {
-                "description": "Enable Varnish for Magento."
+                "description": "Enable/Disable Varnish for Magento."
             }
         },
         "cdnSwitch": {
             "type": "bool",
             "defaultValue": true,
             "metadata": {
-                "description": "Enable Vanish Cache for Magento."
+                "description": "Enable/Disable CDN for static and media files in Magento."
             }
         },
         "tlsSwitch": {
             "type": "bool",
             "defaultValue": false,
             "metadata": {
-                "description": "Enable TLS for Magento."
+                "description": "Enable/Disable TLS for Magento."
             }
         },
         "resourceNamePrefix": {
             "type": "string",
-            "defaultValue": "magentodemo",
+            "defaultValue": "magento",
             "metadata": {
                 "description": "Provide a prefix for creating resource names."
             }
@@ -93,19 +115,19 @@
                 "description": "Provide the external FQDN for the Magento deployment."
             }
         },
-        "mySqlAdministratorLogin": {
+        "mysqlAdministratorLogin": {
             "type": "string",
-            "defaultValue": "mysqlmagentodemo"
+            "defaultValue": "mysqlmagentoadmin"
         },
-        "mySqlAdministratorPassword": {
+        "mysqlAdministratorPassword": {
             "type": "securestring",
-            "defaultValue": "password1234"
+            "defaultValue": "mysqlmagentoadmin@1234"
         },
-        "mySqlDatabaseName": {
+        "mysqlDatabaseName": {
             "type": "string",
             "defaultValue": "magento"
         },
-        "mySqlServerEdition": {
+        "mysqlServerEdition": {
             "type": "string",
             "defaultValue": "Burstable",
             "allowedValues": [
@@ -117,7 +139,7 @@
                 "description": "The tier of the specific SKU. High availability is available only for GeneralPurpose and MemoryOptimized SKUs."
             }
         },
-        "mySqlVersion": {
+        "mysqlVersion": {
             "type": "string",
             "defaultValue": "8.0.21",
             "allowedValues": [
@@ -128,14 +150,20 @@
                 "description": "Server version"
             }
         },
-        "mySqlAvailabilityZone": {
+        "mysqlAvailabilityZone": {
             "type": "string",
             "defaultValue": "",
+            "allowedValues": [
+                "1",
+                "2",
+                "3",
+                ""
+            ],
             "metadata": {
                 "description": "The availability zone information of the server. (If you don't have a preference, leave this setting blank.)"
             }
         },
-        "mySqlHaEnabled": {
+        "mysqlHaEnabled": {
             "type": "string",
             "defaultValue": "Disabled",
             "allowedValues": [
@@ -147,25 +175,37 @@
                 "description": "High availability mode for a server: Disabled, SameZone, or ZoneRedundant."
             }
         },
-        "mySqlStandbyAvailabilityZone": {
+        "mysqlStandbyAvailabilityZone": {
             "type": "string",
             "defaultValue": "",
+            "allowedValues": [
+                "1",
+                "2",
+                "3",
+                ""
+            ],
             "metadata": {
-                "description": "The availability zone of the standby server."
+                "description": "Availability zone of the High availability standby server. (Leave blank for No Preference). Add this value if HA is enabled."
             }
         },
-        "mySqlStorageSizeGB": {
+        "mysqlStorageSizeGB": {
             "defaultValue": 20,
-            "type": "int"
-        },
-        "mySqlStorageIops": {
-            "defaultValue": 360,
+            "minValue": 20,
+            "maxValue": 16384,
             "type": "int",
             "metadata": {
-                "description": "Azure database for MySQL storage Iops"
+                "description": "Azure database for MySQL storage size in GB. Storage is used for the database files, temporary files, transaction logs, and the MySQL server logs. In all compute tiers, the minimum storage supported is 20 GiB and maximum is 16 TiB (16384 GiB)."
             }
         },
-        "mySqlStorageAutogrow": {
+        "mysqlStorageIops": {
+            "defaultValue": 360,
+            "minValue": 360,
+            "type": "int",
+            "metadata": {
+                "description": "Azure Database for MySQL Flexible server storage iops. Minimum 360, Maxium is determined by selected mysqlflexSkuName."
+            }
+        },
+        "mysqlStorageAutogrow": {
             "type": "string",
             "defaultValue": "Enabled",
             "allowedValues": [
@@ -173,33 +213,93 @@
                 "Disabled"
             ]
         },
-        "mySqlSkuName": {
+        "mysqlSkuName": {
             "type": "string",
             "defaultValue": "Standard_B1ms",
+            "allowedValues": [
+                "Standard_B1ms",
+                "Standard_B2s",
+                "Standard_B2ms",
+                "Standard_B4ms",
+                "Standard_B8ms",
+                "Standard_B12ms",
+                "Standard_B16ms",
+                "Standard_B20ms",
+                "Standard_D2ads_v5",
+                "Standard_D2ds_v4",
+                "Standard_D4ads_v5",
+                "Standard_D4ds_v4",
+                "Standard_D8ads_v5",
+                "Standard_D8ds_v4",
+                "Standard_D16ads_v5",
+                "Standard_D16ds_v4",
+                "Standard_D32ads_v5",
+                "Standard_D32ds_v4",
+                "Standard_D48ads_v5",
+                "Standard_D48ds_v4",
+                "Standard_D64ads_v5",
+                "Standard_D64ds_v4",
+                "Standard_E2ds_v4",
+                "Standard_E2ads_v5",
+                "Standard_E4ds_v4",
+                "Standard_E4ads_v5",
+                "Standard_E8ds_v4",
+                "Standard_E8ads_v5",
+                "Standard_E16ds_v4",
+                "Standard_E16ads_v5",
+                "Standard_E20ds_v4",
+                "Standard_E20ads_v5",
+                "Standard_E32ds_v4",
+                "Standard_E32ads_v5",
+                "Standard_E48ds_v4",
+                "Standard_E48ads_v5",
+                "Standard_E64ds_v4",
+                "Standard_E64ads_v5",
+                "Standard_E80ds_v4",
+                "Standard_E2ds_v5",
+                "Standard_E4ds_v5",
+                "Standard_E8ds_v5",
+                "Standard_E16ds_v5",
+                "Standard_E20ds_v5",
+                "Standard_E32ds_v5",
+                "Standard_E48ds_v5",
+                "Standard_E64ds_v5",
+                "Standard_E96ds_v5"
+            ],
             "metadata": {
-                "description": "The name of the SKU. For example, Standard_D32ds_v4."
+                "description": "The name of the sku for Azure Database for MySQL Flexible Servers, e.g. Standard_D32ds_v4. Complete list is available here : https://learn.microsoft.com/en-us/azure/mysql/flexible-server/concepts-service-tiers-storage"
             }
         },
-        "mySqlBackupRetentionDays": {
+        "mysqlBackupRetentionDays": {
             "type": "int",
-            "defaultValue": 7
+            "defaultValue": 7,
+            "minValue": 1,
+            "maxValue": 35,
+            "metadata": {
+                "description": ""
+            }
         },
-        "mySqlGeoRedundantBackup": {
+        "mysqlGeoRedundantBackup": {
             "type": "string",
             "defaultValue": "Disabled",
             "allowedValues": [
                 "Disabled",
                 "Enabled"
-            ]
-        },
-        "kubernetesNodePoolCount": {
-            "defaultValue": 3,
-            "type": "int",
+            ],
             "metadata": {
-                "description": "Specifies the number of agents (VMs) to host docker containers. Allowed values must be in the range of 1 to 100 (inclusive). The default value is 1."
+                "description": ""
             }
         },
-        "kubernetesNodePoolVMSize": {
+        "kubernetesSystemNodePoolCount": {
+            "defaultValue": 1,
+            "type": "int",
+            "minValue": 1,
+            "maxValue": 1000,
+            "metadata": {
+                "description": "Specifies the number of agents (VMs) to host docker containers. Allowed values must be in the range of 1 to 1000 (inclusive). The default value is 1."
+            }
+        },
+        "kubernetesSystemNodePoolVMSize": {
             "defaultValue": "Standard_DS2_v2",
             "type": "string",
             "metadata": {
@@ -210,12 +310,19 @@
             "type": "string",
             "defaultValue": "false",
             "metadata": {
-                "description": "Enable Azure Key Vault secret rotation."
+                "description": "Boolean type. If true, periodically updates the pod mount and Kubernetes Secret with the latest content from external secrets store."
+            }
+        },
+        "rotationPollInterval": {
+            "type": "string",
+            "defaultValue": "2m",
+            "metadata": {
+                "description": "If enableSecretRotation is true, this setting specifies the secret rotation poll interval duration. This duration can be adjusted based on how frequently the mounted contents for all pods and Kubernetes secrets need to be resynced to the latest."
             }
         },
         "storageAccountName": {
             "type": "string",
-            "defaultValue": "magentodemostorage",
+            "defaultValue": "magentostorage",
             "metadata": {
                 "description": "The unique name for Azure Storage Account."
             }
@@ -223,36 +330,56 @@
         "storageAccountSku": {
             "type": "string",
             "defaultValue": "Premium_LRS",
+            "allowedValues": [
+                "Premium_LRS",
+                "Premium_ZRS",
+                "Standard_GRS",
+                "Standard_GZRS",
+                "Standard_LRS",
+                "Standard_ZRS"
+            ],
             "metadata": {
                 "description": "The SKU of the storage account."
             }
         },
-        "storageAccountSkuTier": {
+        "magentoFileShareQuotaGiB": {
+            "defaultValue": "100",
             "type": "string",
-            "defaultValue": "Premium",
             "metadata": {
-                "description": "The tier of the storage account."
+                "description": "Size of the azure file share in GB. This quota is for the Magento media and static files. The minimum share size is 100 GiB."
             }
         },
-        "magentoFileShareQuota": {
-            "defaultValue": "512",
-            "type": "string"
+        "elasticsearchFileShareQuotaGiB": {
+            "defaultValue": "100",
+            "type": "string",
+            "metadata": {
+                "description": "Size of the azure file share in GB. This quota is for the elasticsearch. The minimum share size is 100 GiB."
+            }
         },
-        "elasticsearchFileShareQuota": {
-            "defaultValue": "512",
-            "type": "string"
+        "vmSize": {
+            "type": "string",
+            "defaultValue": "Standard_DS1_v2",
+            "metadata": {
+                "description": "The size of the virtual machine."
+            }
         },
         "vmAdminUsername": {
             "type": "string",
-            "defaultValue": "magentoedemoazureuser"
+            "defaultValue": "magentovmadmin"
         },
         "vmAdminPassword": {
             "type": "securestring",
-            "defaultValue": "Password@1234"
+            "defaultValue": "magentoVM@1234"
         },
         "cdnSkuName": {
             "type": "string",
             "defaultValue": "Standard_Microsoft",
+            "allowedValues": [
+                "Standard_Akamai",
+                "Standard_Microsoft",
+                "Standard_Verizon",
+                "Premium_Verizon"
+            ],
             "metadata": {
                 "description": "The name of the CDN profile SKU."
             }
@@ -376,30 +503,30 @@
             "name": "[variables('mySqlServerName')]",
             "location": "[resourceGroup().location]",
             "sku": {
-                "name": "[parameters('mySqlSkuName')]",
-                "tier": "[parameters('mySqlServerEdition')]"
+                "name": "[parameters('mysqlSkuName')]",
+                "tier": "[parameters('mysqlServerEdition')]"
             },
             "dependsOn": [
                 "[resourceId('Microsoft.Network/privateDnsZones', variables('mysqlPrivateDnsZoneName'))]",
                 "[resourceId('Microsoft.Network/privateDnsZones/virtualNetworkLinks', variables('mysqlPrivateDnsZoneName'), variables('virtualNetworkName'))]"
             ],
             "properties": {
-                "version": "[parameters('mySqlVersion')]",
-                "administratorLogin": "[parameters('mySqlAdministratorLogin')]",
-                "administratorLoginPassword": "[parameters('mySqlAdministratorPassword')]",
-                "availabilityZone": "[parameters('mySqlAvailabilityZone')]",
+                "version": "[parameters('mysqlVersion')]",
+                "administratorLogin": "[parameters('mysqlAdministratorLogin')]",
+                "administratorLoginPassword": "[parameters('mysqlAdministratorPassword')]",
+                "availabilityZone": "[parameters('mysqlAvailabilityZone')]",
                 "highAvailability": {
-                    "mode": "[parameters('mySqlHaEnabled')]",
-                    "standbyAvailabilityZone": "[parameters('mySqlStandbyAvailabilityZone')]"
+                    "mode": "[parameters('mysqlHaEnabled')]",
+                    "standbyAvailabilityZone": "[parameters('mysqlStandbyAvailabilityZone')]"
                 },
                 "storageProfile": {
-                    "autoGrow": "[parameters('mySqlStorageAutogrow')]",
-                    "iops": "[parameters('mySqlStorageIops')]",
-                    "storageSizeGB": "[parameters('mySqlStorageSizeGB')]"
+                    "autoGrow": "[parameters('mysqlStorageAutogrow')]",
+                    "iops": "[parameters('mysqlStorageIops')]",
+                    "storageSizeGB": "[parameters('mysqlStorageSizeGB')]"
                 },
                 "backup": {
-                    "backupRetentionDays": "[parameters('mySqlBackupRetentionDays')]",
-                    "geoRedundantBackup": "[parameters('mySqlGeoRedundantBackup')]"
+                    "backupRetentionDays": "[parameters('mysqlBackupRetentionDays')]",
+                    "geoRedundantBackup": "[parameters('mysqlGeoRedundantBackup')]"
                 },
                 "createMode": "Default",
                 "network": {
@@ -437,7 +564,7 @@
                 {
                     "type": "databases",
                     "apiVersion": "2023-06-30",
-                    "name": "[parameters('mySqlDatabaseName')]",
+                    "name": "[parameters('mysqlDatabaseName')]",
                     "dependsOn": [
                         "[resourceId('Microsoft.DBforMySQL/flexibleServers', variables('mySqlServerName'))]"
                     ],
@@ -466,8 +593,8 @@
                     {
                         "name": "agentpool",
                         "mode": "System",
-                        "count": "[parameters('kubernetesNodePoolCount')]",
-                        "vmSize": "[parameters('kubernetesNodePoolVMSize')]",
+                        "count": "[parameters('kubernetesSystemNodePoolCount')]",
+                        "vmSize": "[parameters('kubernetesSystemNodePoolVMSize')]",
                         "osDiskSizeGB": 0,
                         "vnetSubnetID": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('kubernetesVnetSubnetName'))]",
                         "type": "VirtualMachineScaleSets",
@@ -491,7 +618,7 @@
                         "enabled": true,
                         "config": {
                             "enableSecretRotation": "[parameters('enableSecretRotation')]",
-                            "rotationPollInterval": "2m"
+                            "rotationPollInterval": "[parameters('rotationPollInterval')]"
                         }
                     }
                 }
@@ -543,8 +670,7 @@
             "name": "[parameters('storageAccountName')]",
             "location": "[resourceGroup().location]",
             "sku": {
-                "name": "[parameters('storageAccountSku')]",
-                "tier": "[parameters('storageAccountSkuTier')]"
+                "name": "[parameters('storageAccountSku')]"
             },
             "kind": "FileStorage",
             "properties": {
@@ -562,8 +688,7 @@
                 "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
             ],
             "sku": {
-                "name": "[parameters('storageAccountSku')]",
-                "tier": "[parameters('storageAccountSkuTier')]"
+                "name": "[parameters('storageAccountSku')]"
             },
             "properties": {}
         },
@@ -575,8 +700,8 @@
                 "[resourceId('Microsoft.Storage/storageAccounts/fileServices', parameters('storageAccountName'), variables('storageAccountFileServicesName'))]"
             ],
             "properties": {
-                "accessTier": "[parameters('storageAccountSkuTier')]",
-                "shareQuota": "[parameters('magentoFileShareQuota')]",
+                "accessTier": "[if(or(equals(parameters('storageAccountSku'), 'Premium_LRS'), equals(parameters('storageAccountSku'), 'Premium_ZRS')), 'Premium', 'TransactionOptimized')]",
+                "shareQuota": "[parameters('magentoFileShareQuotaGiB')]",
                 "enabledProtocols": "SMB"
             }
         },
@@ -588,8 +713,8 @@
                 "[resourceId('Microsoft.Storage/storageAccounts/fileServices', parameters('storageAccountName'), variables('storageAccountFileServicesName'))]"
             ],
             "properties": {
-                "accessTier": "[parameters('storageAccountSkuTier')]",
-                "shareQuota": "[parameters('elasticsearchFileShareQuota')]",
+                "accessTier": "[if(or(equals(parameters('storageAccountSku'), 'Premium_LRS'), equals(parameters('storageAccountSku'), 'Premium_ZRS')), 'Premium', 'TransactionOptimized')]",
+                "shareQuota": "[parameters('elasticsearchFileShareQuotaGiB')]",
                 "enabledProtocols": "SMB"
             }
         },
@@ -704,7 +829,7 @@
             ],
             "properties": {
                 "hardwareProfile": {
-                    "vmSize": "Standard_DS1_v2"
+                    "vmSize": "[parameters('vmSize')]"
                 },
                 "osProfile": {
                     "computerName": "[variables('virtualMachineName')]",
