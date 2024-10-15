@@ -11,7 +11,7 @@ spec:
     spec:
       containers:
         - name: magento-setup-job
-          image: aaakarshit/magento-setup-job:latest
+          image: aaakarshit/magento-setup-job:v1.0.0
           envFrom:
             - configMapRef:
                 name: magento-config

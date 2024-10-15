@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: magento-cron
-        image: aaakarshit/magento-cron:latest
+        image: aaakarshit/magento-cron:v1.0.0
         envFrom:
         - configMapRef:
             name: input-config

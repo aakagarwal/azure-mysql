@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: magento-server
-        image: aaakarshit/magento-server:latest
+        image: aaakarshit/magento-server:v1.0.0
         ports:
         - containerPort: 8080
         envFrom:
