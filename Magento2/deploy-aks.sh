@@ -427,4 +427,4 @@ echo "Log file can be found at: $LOG_FILE"
 
 # Schedule VM deletion in 10 seconds
 echo "Scheduled VM deletion in 10 seconds..."
-nohup bash -c "sleep 10 && sudo az vm delete --resource-group $AZURE_RESOURCE_GROUP --name $VIRTUAL_MACHINE_NAME --yes --no-wait" > deploy-aks.log 2>&1 &
+nohup bash -c "sleep 10 && sudo az vm delete --resource-group $AZURE_RESOURCE_GROUP --name $VIRTUAL_MACHINE_NAME --yes --no-wait --delete-os-disk" > deploy-aks.log 2>&1 &
