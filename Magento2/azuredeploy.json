@@ -404,7 +404,7 @@
         },
         "magentoAdminEmail": {
             "type": "string",
-            "defaultValue": "",
+            "defaultValue": "admin@example.com",
             "metadata": {
                 "description": "The email address for the Magento admin."
             }

@@ -203,10 +203,10 @@ else
   cdn_origin=$external_ip_address
 fi
 
-# Using HTTP for base URLs if TLS is not enabled because of self-signed certificate error at CDN
-if [ "${TLS_SWITCH}" = "false" ] || [ "${TLS_SWITCH}" = "False" ]; then
-  magento_base_url_secure=$magento_base_url
-fi
+# # Using HTTP for base URLs if TLS is not enabled because of self-signed certificate error at CDN
+# if [ "${TLS_SWITCH}" = "false" ] || [ "${TLS_SWITCH}" = "False" ]; then
+#   magento_base_url_secure=$magento_base_url
+# fi
 
 echo "Magento Base URL: $magento_base_url"
 echo "Magento Base URL Secure: $magento_base_url_secure"
