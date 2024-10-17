@@ -360,9 +360,9 @@ curl -s "$file_base_url/magento/services.yaml?$sas_token" | sudo kubectl apply -
 # Apply Magento Job Deployment
 echo "Applying Magento job Deployment..."
 curl -s "$file_base_url/magento/job.yaml?$sas_token" | sudo kubectl apply -n $aks_namespace -f -
-# Wait for the job to complete (timeout 15 minutes)
+# Wait for the job to complete (timeout 30 minutes)
 echo "Waiting for the job to complete..."
-sudo kubectl wait --for=condition=complete --timeout=900s job/magento-setup-job -n $aks_namespace
+sudo kubectl wait --for=condition=complete --timeout=1800s job/magento-setup-job -n $aks_namespace
 # Apply Magento server Deployment
 echo "Applying Magento server Deployment..."
 curl -s "$file_base_url/magento/deployment.yaml?$sas_token" | sudo kubectl apply -n $aks_namespace -f -
