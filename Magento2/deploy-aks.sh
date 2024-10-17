@@ -196,18 +196,15 @@ else
   magento_base_url_secure="https://$external_ip_address:443/"
   cdn_origin=$external_ip_address
 fi
+
+# Using HTTP for base URLs if TLS is not enabled because of self-signed certificate error at CDN
+if [ "${TLS_SWITCH}" = "false" ] || [ "${TLS_SWITCH}" = "False" ]; then
+  magento_base_url_secure=$magento_base_url
+fi
+
 echo "Magento Base URL: $magento_base_url"
 echo "Magento Base URL Secure: $magento_base_url_secure"
 echo "CDN Origin: $cdn_origin"
-
-# # Check if TLS Switch is true
-# cd_endpoint_no_https_flag=""
-# if [ "${TLS_SWITCH}" = "true" ] || [ "${TLS_SWITCH}" = "True" ]; then
-#   cd_endpoint_no_https_flag=""
-# else
-#   cd_endpoint_no_https_flag="--no-https"
-# fi
-# echo "CDN Endpoint No HTTPS Flag: $cd_endpoint_no_https_flag"
 
 CDN_STATIC_ENDPOINT_HOST=""
 CDN_MEDIA_ENDPOINT_HOST=""
@@ -220,7 +217,6 @@ if [ "${CDN_SWITCH}" = "true" ] || [ "${CDN_SWITCH}" = "True" ]; then
     --resource-group $AZURE_RESOURCE_GROUP \
     --origin-host-header $cdn_origin \
     --origin $cdn_origin
-    # ${cd_endpoint_no_https_flag}
 
   # Create CDN Endpoint rule for static
   echo "Creating CDN Endpoint rule for static..."
@@ -252,7 +248,6 @@ if [ "${CDN_SWITCH}" = "true" ] || [ "${CDN_SWITCH}" = "True" ]; then
     --resource-group $AZURE_RESOURCE_GROUP \
     --origin-host-header $cdn_origin \
     --origin $cdn_origin
-    # ${cd_endpoint_no_https_flag}
 
   # Create CDN Endpoint rule for media
   echo "Creating CDN Endpoint rule for media..."
@@ -285,8 +280,15 @@ echo "CDN Media Endpoint Host: $CDN_MEDIA_ENDPOINT_HOST"
 
 CDN_STATIC_URL="http://$CDN_STATIC_ENDPOINT_HOST/static/"
 CDN_MEDIA_URL="http://$CDN_MEDIA_ENDPOINT_HOST/media/"
-CDN_STATIC_URL_SECURE="https://$CDN_STATIC_ENDPOINT_HOST/static/"
-CDN_MEDIA_URL_SECURE="https://$CDN_MEDIA_ENDPOINT_HOST/media/"
+
+# Using HTTP for CDN URLs if TLS is not enabled because of self-signed certificate error at CDN
+if [ "${TLS_SWITCH}" = "true" ] || [ "${TLS_SWITCH}" = "True" ]; then
+  CDN_STATIC_URL_SECURE="https://$CDN_STATIC_ENDPOINT_HOST/static/"
+  CDN_MEDIA_URL_SECURE="https://$CDN_MEDIA_ENDPOINT_HOST/media/"
+else
+  CDN_STATIC_URL_SECURE="http://$CDN_STATIC_ENDPOINT_HOST/static/"
+  CDN_MEDIA_URL_SECURE="http://$CDN_MEDIA_ENDPOINT_HOST/media/"
+fi
 
 echo "CDN Static URL: $CDN_STATIC_URL"
 echo "CDN Media URL: $CDN_MEDIA_URL"
