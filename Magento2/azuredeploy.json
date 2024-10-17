@@ -73,14 +73,14 @@
                 "description": "Enable/Disable Varnish for Magento."
             }
         },
-        "cdnSwitch": {
+        "CDNSwitch": {
             "type": "bool",
             "defaultValue": true,
             "metadata": {
                 "description": "Enable/Disable CDN for static and media files in Magento."
             }
         },
-        "tlsSwitch": {
+        "TLSSwitch": {
             "type": "bool",
             "defaultValue": false,
             "metadata": {
@@ -117,15 +117,24 @@
         },
         "mysqlAdministratorLogin": {
             "type": "string",
-            "defaultValue": "mysqlmagentoadmin"
+            "defaultValue": "mysqlmagentoadmin",
+            "metadata": {
+                "description": ""
+            }
         },
         "mysqlAdministratorPassword": {
             "type": "securestring",
-            "defaultValue": "mysqlmagentoadmin@1234"
+            "defaultValue": "mysqlmagentoadmin@1234",
+            "metadata": {
+                "description": ""
+            }
         },
         "mysqlDatabaseName": {
             "type": "string",
-            "defaultValue": "magento"
+            "defaultValue": "magento",
+            "metadata": {
+                "description": ""
+            }
         },
         "mysqlServerEdition": {
             "type": "string",
@@ -211,7 +220,10 @@
             "allowedValues": [
                 "Enabled",
                 "Disabled"
-            ]
+            ],
+            "metadata": {
+                "description": ""
+            }
         },
         "mysqlSkuName": {
             "type": "string",
@@ -356,22 +368,28 @@
                 "description": "Size of the azure file share in GB. This quota is for the elasticsearch. The minimum share size is 100 GiB."
             }
         },
-        "vmSize": {
+        "VMSize": {
             "type": "string",
             "defaultValue": "Standard_DS1_v2",
             "metadata": {
                 "description": "The size of the virtual machine."
             }
         },
-        "vmAdminUsername": {
+        "VMAdminUsername": {
             "type": "string",
-            "defaultValue": "magentovmadmin"
+            "defaultValue": "magentovmadmin",
+            "metadata": {
+                "description": ""
+            }
         },
-        "vmAdminPassword": {
+        "VMAdminPassword": {
             "type": "securestring",
-            "defaultValue": "magentoVM@1234"
+            "defaultValue": "magentoVM@1234",
+            "metadata": {
+                "description": ""
+            }
         },
-        "cdnSkuName": {
+        "CDNSkuName": {
             "type": "string",
             "defaultValue": "Standard_Microsoft",
             "allowedValues": [
@@ -382,6 +400,27 @@
             ],
             "metadata": {
                 "description": "The name of the CDN profile SKU."
+            }
+        },
+        "magentoAdminEmail": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "The email address for the Magento admin."
+            }
+        },
+        "magentoCurrency": {
+            "type": "string",
+            "defaultValue": "USD",
+            "metadata": {
+                "description": "The currency for the Magento store."
+            }
+        },
+        "magentoTimezone": {
+            "type": "string",
+            "defaultValue": "UTC",
+            "metadata": {
+                "description": "The timezone for the Magento store."
             }
         }
     },
@@ -402,6 +441,9 @@
         "kubernetesClusterSecretProviderRoleAssignmentName": "[guid(parameters('keyVaultName'), variables('kubernetesClusterName'), 'AzureKeyVaultSecretProvider', uniqueString(deployment().name))]",
         "cdnProfileName": "[concat(parameters('resourceNamePrefix'), '-cdn')]",
         "fileSharePrivateEndpointName": "[concat(parameters('resourceNamePrefix'), '-fs-pe')]",
+        "enableVirtualMachinePublicIp": true,
+        "virtualMachinePublicIpAddressesName": "[concat(parameters('resourceNamePrefix'), '-vm-ip')]",
+        "virtualMachineNetworkInterfaceName": "[concat(parameters('resourceNamePrefix'), '-vm-nic')]",
         "virtualMachineName": "[concat(parameters('resourceNamePrefix'), '-vm')]",
         "fileSharePrivateIpDeploymentName": "[concat(parameters('resourceNamePrefix'), '-fs-ip-deployment')]",
         "filePrivateDnsZoneName": "privatelink.file.core.windows.net",
@@ -594,7 +636,7 @@
                         "name": "agentpool",
                         "mode": "System",
                         "count": "[parameters('kubernetesSystemNodePoolCount')]",
-                        "vmSize": "[parameters('kubernetesSystemNodePoolVMSize')]",
+                        "VMSize": "[parameters('kubernetesSystemNodePoolVMSize')]",
                         "osDiskSizeGB": 0,
                         "vnetSubnetID": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('kubernetesVnetSubnetName'))]",
                         "type": "VirtualMachineScaleSets",
@@ -614,7 +656,7 @@
                     "dockerBridgeCidr": "172.17.0.1/16"
                 },
                 "addonProfiles": {
-                    "azureKeyvaultSecretsProvider":{
+                    "azureKeyvaultSecretsProvider": {
                         "enabled": true,
                         "config": {
                             "enableSecretRotation": "[parameters('enableSecretRotation')]",
@@ -625,10 +667,10 @@
             }
         },
         {
-            "condition": "[equals(parameters('tlsSwitch'), 'true')]",
+            "condition": "[parameters('TLSSwitch')]",
             "type": "Microsoft.KeyVault/vaults/providers/roleAssignments",
             "apiVersion": "2020-04-01-preview",
-            "name": "[concat(if(parameters('tlsSwitch'), parameters('keyVaultName'), 'no-keyvault'), '/', 'Microsoft.Authorization/', variables('kubernetesClusterSecretProviderRoleAssignmentName'))]",
+            "name": "[concat(if(parameters('TLSSwitch'), parameters('keyVaultName'), 'no-keyvault'), '/', 'Microsoft.Authorization/', variables('kubernetesClusterSecretProviderRoleAssignmentName'))]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]",
                 "[resourceId('Microsoft.ContainerService/managedClusters', variables('kubernetesClusterName'))]"
@@ -654,13 +696,13 @@
             }
         },
         {
-            "condition": "[parameters('cdnSwitch')]",
+            "condition": "[parameters('CDNSwitch')]",
             "name": "[variables('cdnProfileName')]",
             "type": "Microsoft.Cdn/profiles",
             "location": "[resourceGroup().location]",
             "apiVersion": "2023-05-01",
             "sku": {
-                "name": "[parameters('cdnSkuName')]"
+                "name": "[parameters('CDNSkuName')]"
             },
             "properties": {}
         },
@@ -821,20 +863,82 @@
             }
         },
         {
+            "condition": "[equals(variables('enableVirtualMachinePublicIp'), true())]",
+            "type": "Microsoft.Network/publicIPAddresses",
+            "apiVersion": "2023-06-01",
+            "name": "[variables('virtualMachinePublicIpAddressesName')]",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "publicIPAllocationMethod": "Dynamic"
+            }
+        },
+        {
+            "condition": "[equals(variables('enableVirtualMachinePublicIp'), true())]",
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2023-06-01",
+            "name": "[variables('virtualMachineNetworkInterfaceName')]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]",
+                "[resourceId('Microsoft.Network/publicIPAddresses', variables('virtualMachinePublicIpAddressesName'))]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "subnet": {
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('kubernetesVnetSubnetName'))]"
+                            },
+                            "privateIPAllocationMethod": "Dynamic",
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('virtualMachinePublicIpAddressesName'))]"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "condition": "[equals(variables('enableVirtualMachinePublicIp'), false())]",
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2023-06-01",
+            "name": "[variables('virtualMachineNetworkInterfaceName')]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]",
+                "[resourceId('Microsoft.Network/publicIPAddresses', variables('virtualMachinePublicIpAddressesName'))]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "subnet": {
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('kubernetesVnetSubnetName'))]"
+                            },
+                            "privateIPAllocationMethod": "Dynamic"
+                        }
+                    }
+                ]
+            }
+        },
+        {
             "type": "Microsoft.Compute/virtualMachines",
             "apiVersion": "2023-03-01",
             "name": "[variables('virtualMachineName')]",
             "location": "[resourceGroup().location]",
             "dependsOn": [
+                "[resourceId('Microsoft.Network/networkInterfaces', variables('virtualMachineNetworkInterfaceName'))]"
             ],
             "properties": {
                 "hardwareProfile": {
-                    "vmSize": "[parameters('vmSize')]"
+                    "VMSize": "[parameters('VMSize')]"
                 },
                 "osProfile": {
                     "computerName": "[variables('virtualMachineName')]",
-                    "adminUsername": "[parameters('vmAdminUsername')]",
-                    "adminPassword": "[parameters('vmAdminPassword')]"
+                    "adminUsername": "[parameters('VMAdminUsername')]",
+                    "adminPassword": "[parameters('VMAdminPassword')]"
                 },
                 "storageProfile": {
                     "imageReference": {
@@ -847,6 +951,13 @@
                         "name": "[concat(parameters('resourceNamePrefix'), '-vm-osdisk')]",
                         "createOption": "FromImage"
                     }
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('virtualMachineNetworkInterfaceName'))]"
+                        }
+                    ]
                 }
             }
         },
@@ -856,6 +967,7 @@
             "name": "[concat(variables('virtualMachineName'), '/CustomScriptExtension')]",
             "location": "[resourceGroup().location]",
             "dependsOn": [
+                "[resourceId('Microsoft.Network/publicIPAddresses', variables('virtualMachinePublicIpAddressesName'))]",
                 "[resourceId('Microsoft.Compute/virtualMachines', variables('virtualMachineName'))]",
                 "[resourceId('Microsoft.DBforMySQL/flexibleServers', variables('mySqlServerName'))]",
                 "[resourceId('Microsoft.Cdn/profiles', variables('cdnProfileName'))]",
@@ -875,7 +987,7 @@
                     "fileUris": [
                         "https://raw.githubusercontent.com/aakagarwal/azure-mysql/refs/heads/master/Magento2/deploy-aks.sh"
                     ],
-                    "commandToExecute": "[concat('bash deploy-aks.prod.sh ', parameters('azureSubscriptionId'), ' ', parameters('azureResourceGroup'), ' ', parameters('servicePrincipalAppId'), ' ', parameters('servicePrincipalPassword'), ' ', parameters('tenentId'), ' ', parameters('composerUsername'), ' ', parameters('composerPassword'), ' ', concat(variables('mySqlServerName'), '.', variables('mySqlPrivateDnsZoneName')), ' ', parameters('mysqlAdministratorLogin'), ' ', parameters('mysqlAdministratorPassword'), ' ',  variables('kubernetesClusterName'), ' ', parameters('storageAccountName'), ' ', listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), '2022-09-01').keys[0].value, ' ', parameters('magentoAdminUsername'), ' ', parameters('magentoAdminPassword'), ' ', variables('virtualMachineName'), ' ', if(not(empty(parameters('externalFqdn'))), parameters('externalFqdn'), 'EXTERNAL_FQDN'), ' ', variables('cdnProfileName'), ' ', parameters('redisCacheSwitch'), ' ', parameters('varnishCacheSwitch'), ' ', parameters('cdnSwitch'), ' ', parameters('tlsSwitch'), ' ', reference(resourceId('Microsoft.ContainerService/managedClusters', variables('kubernetesClusterName')), '2023-01-01').addonProfiles.azureKeyvaultSecretsProvider.identity.clientId, ' ', if(parameters('tlsSwitch'), parameters('keyVaultName'), 'KEYVAULT_NAME'), ' ', if(parameters('tlsSwitch'), parameters('certificateName'), 'CERTIFICATE_NAME'))]"
+                    "commandToExecute": "[concat('bash deploy-aks.sh ', parameters('azureSubscriptionId'), ' ', parameters('azureResourceGroup'), ' ', parameters('servicePrincipalAppId'), ' ', parameters('servicePrincipalPassword'), ' ', parameters('tenentId'), ' ', parameters('composerUsername'), ' ', parameters('composerPassword'), ' ', concat(variables('mySqlServerName'), '.', variables('mySqlPrivateDnsZoneName')), ' ', parameters('mysqlAdministratorLogin'), ' ', parameters('mysqlAdministratorPassword'), ' ',  variables('kubernetesClusterName'), ' ', parameters('storageAccountName'), ' ', listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), '2022-09-01').keys[0].value, ' ', parameters('magentoAdminUsername'), ' ', parameters('magentoAdminPassword'), ' ', variables('virtualMachineName'), ' ', if(not(empty(parameters('externalFqdn'))), parameters('externalFqdn'), 'EXTERNAL_FQDN'), ' ', variables('cdnProfileName'), ' ', parameters('redisCacheSwitch'), ' ', parameters('varnishCacheSwitch'), ' ', parameters('CDNSwitch'), ' ', parameters('TLSSwitch'), ' ', reference(resourceId('Microsoft.ContainerService/managedClusters', variables('kubernetesClusterName')), '2023-01-01').addonProfiles.azureKeyvaultSecretsProvider.identity.clientId, ' ', if(parameters('TLSSwitch'), parameters('keyVaultName'), 'KEYVAULT_NAME'), ' ', if(parameters('TLSSwitch'), parameters('certificateName'), 'CERTIFICATE_NAME'), ' ', parameters('magentoAdminEmail'), ' ', parameters('magentoCurrency'), ' ', parameters('magentoTimezone'))]"
                 },
                 "settings": {}
             }
