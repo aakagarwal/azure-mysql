@@ -49,6 +49,9 @@ TLS_SWITCH=${22}
 AKS_SECRET_PROVIDER_CLIENT_ID=${23}
 KEYVAULT_NAME=${24}
 CERTIFICATE_NAME=${25}
+MAGENTO_ADMIN_EMAIL=${26}
+MAGENTO_CURRENCY=${27}
+MAGENTO_TIMEZONE=${28}
 
 # Printing all parameters
 echo "AZURE_SUBSCRIPTION_ID: $AZURE_SUBSCRIPTION_ID"
@@ -76,6 +79,9 @@ echo "TLS_SWITCH: $TLS_SWITCH"
 echo "AKS_SECRET_PROVIDER_CLIENT_ID: $AKS_SECRET_PROVIDER_CLIENT_ID"
 echo "KEYVAULT_NAME: $KEYVAULT_NAME"
 echo "CERTIFICATE_NAME: $CERTIFICATE_NAME"
+echo "MAGENTO_ADMIN_EMAIL: $MAGENTO_ADMIN_EMAIL"
+echo "MAGENTO_CURRENCY: $MAGENTO_CURRENCY"
+echo "MAGENTO_TIMEZONE: $MAGENTO_TIMEZONE"
 
 echo "External FQDN: $EXTERNAL_FQDN"
 # Mocking External FQDN (if not provided)
@@ -300,6 +306,9 @@ echo "Applying Input Configmap..."
 sudo kubectl create configmap input-config -n $aks_namespace \
   --from-literal=MAGENTO_BASE_URL=$magento_base_url \
   --from-literal=MAGENTO_BASE_URL_SECURE=$magento_base_url_secure \
+  --from-literal=MAGENTO_ADMIN_EMAIL=$MAGENTO_ADMIN_EMAIL \
+  --from-literal=MAGENTO_CURRENCY=$MAGENTO_CURRENCY \
+  --from-literal=MAGENTO_TIMEZONE=$MAGENTO_TIMEZONE \
   --from-literal=DATABASE_HOST=$MY_SQL_SERVER_HOST_NAME \
   --from-literal=MAGENTO_BASE_URL_STATIC=$CDN_STATIC_URL \
   --from-literal=MAGENTO_BASE_URL_MEDIA=$CDN_MEDIA_URL \
