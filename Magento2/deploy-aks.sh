@@ -200,6 +200,15 @@ echo "Magento Base URL: $magento_base_url"
 echo "Magento Base URL Secure: $magento_base_url_secure"
 echo "CDN Origin: $cdn_origin"
 
+# # Check if TLS Switch is true
+# cd_endpoint_no_https_flag=""
+# if [ "${TLS_SWITCH}" = "true" ] || [ "${TLS_SWITCH}" = "True" ]; then
+#   cd_endpoint_no_https_flag=""
+# else
+#   cd_endpoint_no_https_flag="--no-https"
+# fi
+# echo "CDN Endpoint No HTTPS Flag: $cd_endpoint_no_https_flag"
+
 CDN_STATIC_ENDPOINT_HOST=""
 CDN_MEDIA_ENDPOINT_HOST=""
 if [ "${CDN_SWITCH}" = "true" ] || [ "${CDN_SWITCH}" = "True" ]; then
@@ -211,6 +220,7 @@ if [ "${CDN_SWITCH}" = "true" ] || [ "${CDN_SWITCH}" = "True" ]; then
     --resource-group $AZURE_RESOURCE_GROUP \
     --origin-host-header $cdn_origin \
     --origin $cdn_origin
+    # ${cd_endpoint_no_https_flag}
 
   # Create CDN Endpoint rule for static
   echo "Creating CDN Endpoint rule for static..."
@@ -242,6 +252,7 @@ if [ "${CDN_SWITCH}" = "true" ] || [ "${CDN_SWITCH}" = "True" ]; then
     --resource-group $AZURE_RESOURCE_GROUP \
     --origin-host-header $cdn_origin \
     --origin $cdn_origin
+    # ${cd_endpoint_no_https_flag}
 
   # Create CDN Endpoint rule for media
   echo "Creating CDN Endpoint rule for media..."
@@ -264,6 +275,9 @@ if [ "${CDN_SWITCH}" = "true" ] || [ "${CDN_SWITCH}" = "True" ]; then
     --resource-group $AZURE_RESOURCE_GROUP \
     --query "hostName" \
     --output tsv)
+else
+  CDN_STATIC_ENDPOINT_HOST=$cdn_origin
+  CDN_MEDIA_ENDPOINT_HOST=$cdn_origin
 fi
 echo "CDN Static Endpoint Host: $CDN_STATIC_ENDPOINT_HOST"
 echo "CDN Media Endpoint Host: $CDN_MEDIA_ENDPOINT_HOST"
@@ -273,6 +287,7 @@ CDN_STATIC_URL="http://$CDN_STATIC_ENDPOINT_HOST/static/"
 CDN_MEDIA_URL="http://$CDN_MEDIA_ENDPOINT_HOST/media/"
 CDN_STATIC_URL_SECURE="https://$CDN_STATIC_ENDPOINT_HOST/static/"
 CDN_MEDIA_URL_SECURE="https://$CDN_MEDIA_ENDPOINT_HOST/media/"
+
 echo "CDN Static URL: $CDN_STATIC_URL"
 echo "CDN Media URL: $CDN_MEDIA_URL"
 echo "CDN Static URL Secure: $CDN_STATIC_URL_SECURE"
