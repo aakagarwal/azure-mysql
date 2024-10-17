@@ -945,7 +945,8 @@
                         "publisher": "Canonical",
                         "offer": "UbuntuServer",
                         "sku": "18.04-LTS",
-                        "version": "latest"
+                        "version": "latest",
+                        "deleteOption": "Delete"
                     },
                     "osDisk": {
                         "name": "[concat(parameters('resourceNamePrefix'), '-vm-osdisk')]",
@@ -955,7 +956,11 @@
                 "networkProfile": {
                     "networkInterfaces": [
                         {
-                            "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('virtualMachineNetworkInterfaceName'))]"
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('virtualMachineNetworkInterfaceName'))]",
+                            "properties": {
+                                "primary": true,
+                                "deleteOption": "Delete"
+                            }
                         }
                     ]
                 }
