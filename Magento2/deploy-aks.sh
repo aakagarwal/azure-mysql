@@ -188,6 +188,11 @@ external_ip_service_name="ingress-nginx-controller"
 external_ip_address=$(waitAndGetExternalIpForService $external_ip_service_name $aks_namespace)
 echo "External IP Address: $external_ip_address"
 
+# TODO: This code is for testing purposes only, remove this once testing is done.
+# Replace dots with hyphens
+ip_address_with_hyphens=$(echo "$external_ip_address" | sed 's/\./-/g')
+EXTERNAL_FQDN="$ip_address_with_hyphens.traefik.me"
+
 # Applying the input configmap according to Infra deployment
 echo "Applying configmaps..."
 magento_base_url=""
@@ -202,11 +207,6 @@ else
   magento_base_url_secure="https://$external_ip_address:443/"
   cdn_origin=$external_ip_address
 fi
-
-# # Using HTTP for base URLs if TLS is not enabled because of self-signed certificate error at CDN
-# if [ "${TLS_SWITCH}" = "false" ] || [ "${TLS_SWITCH}" = "False" ]; then
-#   magento_base_url_secure=$magento_base_url
-# fi
 
 echo "Magento Base URL: $magento_base_url"
 echo "Magento Base URL Secure: $magento_base_url_secure"
