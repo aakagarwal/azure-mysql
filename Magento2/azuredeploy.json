@@ -2,18 +2,6 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "azureSubscriptionId": {
-            "type": "string",
-            "metadata": {
-                "description": "The subscriptionId where the resources will be deployed."
-            }
-        },
-        "azureResourceGroup": {
-            "type": "string",
-            "metadata": {
-                "description": "The resource group where the resources will be deployed."
-            }
-        },
         "servicePrincipalAppId": {
             "type": "securestring",
             "metadata": {
@@ -24,12 +12,6 @@
             "type": "securestring",
             "metadata": {
                 "description": "The service principal password for the Azure subscription."
-            }
-        },
-        "tenentId": {
-            "type": "securestring",
-            "metadata": {
-                "description": "The tenantId for the Azure subscription."
             }
         },
         "composerUsername": {
@@ -425,6 +407,9 @@
         }
     },
     "variables": {
+        "azureSubscriptionId": "[subscription().subscriptionId]",
+        "azureResourceGroup": "[resourceGroup().name]",
+        "tenentId": "[subscription().tenantId]",
         "uniqueSuffix": "[uniqueString(resourceGroup().id)]",
         "virtualNetworkName": "[concat(parameters('resourceNamePrefix'), '-vnet')]",
         "virtualNetworkAddressPrefix": "10.0.0.0/8",
@@ -945,12 +930,12 @@
                         "publisher": "Canonical",
                         "offer": "UbuntuServer",
                         "sku": "18.04-LTS",
-                        "version": "latest",
-                        "deleteOption": "Delete"
+                        "version": "latest"
                     },
                     "osDisk": {
                         "name": "[concat(parameters('resourceNamePrefix'), '-vm-osdisk')]",
-                        "createOption": "FromImage"
+                        "createOption": "FromImage",
+                        "deleteOption": "Delete"
                     }
                 },
                 "networkProfile": {
@@ -992,7 +977,7 @@
                     "fileUris": [
                         "https://raw.githubusercontent.com/aakagarwal/azure-mysql/refs/heads/master/Magento2/deploy-aks.sh"
                     ],
-                    "commandToExecute": "[concat('bash deploy-aks.sh ', parameters('azureSubscriptionId'), ' ', parameters('azureResourceGroup'), ' ', parameters('servicePrincipalAppId'), ' ', parameters('servicePrincipalPassword'), ' ', parameters('tenentId'), ' ', parameters('composerUsername'), ' ', parameters('composerPassword'), ' ', concat(variables('mySqlServerName'), '.', variables('mySqlPrivateDnsZoneName')), ' ', parameters('mysqlAdministratorLogin'), ' ', parameters('mysqlAdministratorPassword'), ' ',  variables('kubernetesClusterName'), ' ', parameters('storageAccountName'), ' ', listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), '2022-09-01').keys[0].value, ' ', parameters('magentoAdminUsername'), ' ', parameters('magentoAdminPassword'), ' ', variables('virtualMachineName'), ' ', if(not(empty(parameters('externalFqdn'))), parameters('externalFqdn'), 'EXTERNAL_FQDN'), ' ', variables('cdnProfileName'), ' ', parameters('redisCacheSwitch'), ' ', parameters('varnishCacheSwitch'), ' ', parameters('CDNSwitch'), ' ', parameters('TLSSwitch'), ' ', reference(resourceId('Microsoft.ContainerService/managedClusters', variables('kubernetesClusterName')), '2023-01-01').addonProfiles.azureKeyvaultSecretsProvider.identity.clientId, ' ', if(parameters('TLSSwitch'), parameters('keyVaultName'), 'KEYVAULT_NAME'), ' ', if(parameters('TLSSwitch'), parameters('certificateName'), 'CERTIFICATE_NAME'), ' ', parameters('magentoAdminEmail'), ' ', parameters('magentoCurrency'), ' ', parameters('magentoTimezone'))]"
+                    "commandToExecute": "[concat('bash deploy-aks.sh ', variables('azureSubscriptionId'), ' ', variables('azureResourceGroup'), ' ', parameters('servicePrincipalAppId'), ' ', parameters('servicePrincipalPassword'), ' ', variables('tenentId'), ' ', parameters('composerUsername'), ' ', parameters('composerPassword'), ' ', concat(variables('mySqlServerName'), '.', variables('mySqlPrivateDnsZoneName')), ' ', parameters('mysqlAdministratorLogin'), ' ', parameters('mysqlAdministratorPassword'), ' ',  variables('kubernetesClusterName'), ' ', parameters('storageAccountName'), ' ', listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), '2022-09-01').keys[0].value, ' ', parameters('magentoAdminUsername'), ' ', parameters('magentoAdminPassword'), ' ', variables('virtualMachineName'), ' ', if(not(empty(parameters('externalFqdn'))), parameters('externalFqdn'), 'EXTERNAL_FQDN'), ' ', variables('cdnProfileName'), ' ', parameters('redisCacheSwitch'), ' ', parameters('varnishCacheSwitch'), ' ', parameters('CDNSwitch'), ' ', parameters('TLSSwitch'), ' ', reference(resourceId('Microsoft.ContainerService/managedClusters', variables('kubernetesClusterName')), '2023-01-01').addonProfiles.azureKeyvaultSecretsProvider.identity.clientId, ' ', if(parameters('TLSSwitch'), parameters('keyVaultName'), 'KEYVAULT_NAME'), ' ', if(parameters('TLSSwitch'), parameters('certificateName'), 'CERTIFICATE_NAME'), ' ', parameters('magentoAdminEmail'), ' ', parameters('magentoCurrency'), ' ', parameters('magentoTimezone'))]"
                 },
                 "settings": {}
             }
